@@ -1,3 +1,11 @@
+/*
+Package netstat helps you query open socket connections.
+
+Netstat searches the proc filesystem to gather information about open connections and the
+associated processes.
+
+There is currently no support planned for Mac OS or *BSD without procfs support.
+*/
 package netstat
 
 import (
@@ -15,18 +23,31 @@ import (
 	"strings"
 )
 
+// Netstat should point to a file in the proc filesystem where information
+// about open sockets can be gathered.
 type Netstat string
 
+// Entry contains the gathered information.
 type Entry struct {
-	Exe     string
+	// Exe contains the path to the process.
+	// Exe is empty if there was an error reading /proc/pid/exe.
+	Exe string
+	// Cmdline contains the complete command line for the process.
+	// Returns an empty array if /proc/pid/cmdline can't be read.
 	Cmdline []string
-	Pid     int
+	// Pid contains the pid of the process. Is zero if open socket can't be assigned to a pid.
+	Pid int
 
+	// Inode contains the inode for the open socket.
 	Inode uint64
 
-	IP         string
-	Port       int64
-	RemoteIP   string
+	// IP holds the local IP for the socket.
+	IP string
+	// Port holds the local port for the socket.
+	Port int64
+	// RemoteIP holds the remote IP for the socket.
+	RemoteIP string
+	// RemotePort holds the remote port for the socket.
 	RemotePort int64
 }
 
@@ -34,9 +55,13 @@ type Entry struct {
 var ProcRoot = "/proc"
 
 var (
-	TCP  = Netstat("net/tcp")
+	// TCP contains the standard location to read open TCP IPv4 sockets.
+	TCP = Netstat("net/tcp")
+	// TCP6 contains the standard location to read open TCP IPv6 sockets.
 	TCP6 = Netstat("net/tcp6")
-	UDP  = Netstat("net/udp")
+	// UDP contains the standard location to read open UDP IPv4 sockets.
+	UDP = Netstat("net/udp")
+	// UDP6 contains the standard location to read open UDP IPv6 sockets.
 	UDP6 = Netstat("net/udp6")
 )
 
@@ -45,6 +70,8 @@ var (
 	procFdLinkParseType2 = regexp.MustCompile(`^\[0000\]:(\d+)$`)
 )
 
+// Entries queries the given /proc/net file and returns the found entries.
+// Returns an error if the /proc/net file can't be read.
 func (n Netstat) Entries() ([]Entry, error) {
 	inodeToPid := make(chan map[uint64]int)
 
