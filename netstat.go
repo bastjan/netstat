@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -133,28 +134,7 @@ func hexToDec(hex string) int64 {
 }
 
 func parseIP(ip string) string {
-	switch len(ip) {
-	case 8:
-		return parseIP4(ip)
-	case 32:
-		return parseIP6(ip)
-	default:
-		return ""
-	}
-}
-
-func parseIP4(ip string) string {
-	seg := parseIPSegments(ip)
-	return fmt.Sprintf("%d.%d.%d.%d", seg[0], seg[1], seg[2], seg[3])
-}
-
-func parseIP6(ip string) string {
-	seg := parseIPSegments(ip)
-	return fmt.Sprintf("%x%x:%x%x:%x%x:%x%x:%x%x:%x%x:%x%x:%x%x",
-		seg[0], seg[1], seg[2], seg[3],
-		seg[4], seg[5], seg[6], seg[7],
-		seg[8], seg[9], seg[10], seg[11],
-		seg[12], seg[13], seg[14], seg[15])
+	return net.IP(parseIPSegments(ip)).String()
 }
 
 func parseIPSegments(ip string) []uint8 {
