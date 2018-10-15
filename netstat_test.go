@@ -49,3 +49,9 @@ func TestEntries(t *testing.T) {
 	assert.NilError(t, err)
 	assert.DeepEqual(t, entries, []netstat.Entry{tcpEntry6})
 }
+
+func TestEntriesProcNetNotFound(t *testing.T) {
+	_, err := netstat.Netstat("./nothere").Entries()
+	assert.ErrorContains(t, err, "can't open proc file")
+	assert.ErrorContains(t, err, "test/proc/nothere")
+}
