@@ -76,7 +76,7 @@ func procNetToEntries(lines [][]string, inodeToPid map[uint64]int) []Entry {
 			Inode:      inode,
 			IP:         parseIP(localIPPort[0]),
 			Port:       hexToDec(localIPPort[1]),
-			RemoteIP:   parseIP(localIPPort[0]),
+			RemoteIP:   parseIP(remoteIPPort[0]),
 			RemotePort: hexToDec(remoteIPPort[1]),
 		}
 
