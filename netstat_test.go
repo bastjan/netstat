@@ -55,3 +55,8 @@ func TestEntriesProcNetNotFound(t *testing.T) {
 	assert.ErrorContains(t, err, "can't open proc file")
 	assert.ErrorContains(t, err, "test/proc/nothere")
 }
+
+func TestEntriesEmptyFileDoesNotCrashNetstat(t *testing.T) {
+	_, err := netstat.Netstat("net/empty").Entries()
+	assert.ErrorContains(t, err, "net/empty has no content")
+}

@@ -11,7 +11,6 @@ package netstat
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -138,7 +137,7 @@ func (n Netstat) readProcNetFile() ([][]string, error) {
 		lines = append(lines, lineParts(string(bytes.Trim(line, "\t\n "))))
 	}
 	if len(lines) == 0 {
-		return nil, errors.New("can't read proc file: file has no contents")
+		return nil, fmt.Errorf("can't read proc file: %s has no content", n)
 	}
 	// Remove header line
 	return lines[1:], nil
