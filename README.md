@@ -4,7 +4,7 @@
 
 Package netstat helps you query open socket connections.
 
-# Getting Started
+## Getting Started
 
 ```go
 import "github.com/bastjan/netstat"
@@ -16,12 +16,12 @@ netstat.TCP.Entries()
 netstat.UDP6.Entries()
 ```
 
-# Development Status: Work in Progress
+## Development Status: Work in Progress
 
 The api is not yet final and can change.
 First stable release will be version 1.0.0.
 
-# Support for Mac OS and *BSD
+## Support for Mac OS and *BSD
 
 There is currently no support planned for MacOS or *BSD without procfs support.
 
