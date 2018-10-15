@@ -10,6 +10,7 @@ import (
 
 var (
 	tcpEntry = netstat.Entry{
+		Exe:     "/bin/sleep",
 		Cmdline: []string{},
 		Pid:     3001,
 
@@ -22,6 +23,7 @@ var (
 	}
 
 	tcpEntry6 = netstat.Entry{
+		Exe:     "",
 		Cmdline: []string{"/usr/bin/bundle", "exec", "puma", "-p41703"},
 		Pid:     3002,
 

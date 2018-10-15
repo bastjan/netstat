@@ -17,6 +17,7 @@ import (
 type Netstat string
 
 type Entry struct {
+	Exe     string
 	Cmdline []string
 	Pid     int
 
@@ -67,10 +68,10 @@ func procNetToEntries(lines [][]string, inodeToPid map[uint64]int) []Entry {
 		remoteIPPort := strings.Split(line[2], ":")
 		inode := parseInode(line[9])
 		pid := inodeToPid[inode]
-		cmdline := procGetCmdline(pid)
 
 		entry := Entry{
-			Cmdline:    cmdline,
+			Exe:        procGetExe(pid),
+			Cmdline:    procGetCmdline(pid),
 			Pid:        pid,
 			Inode:      inode,
 			IP:         parseIP(localIPPort[0]),
@@ -173,6 +174,15 @@ func procGetCmdline(pid int) []string {
 	}
 	content = bytes.TrimRight(content, "\x00")
 	return strings.Split(string(content), "\x00")
+}
+
+func procGetExe(pid int) string {
+	path := filepath.Join(ProcRoot, strconv.Itoa(pid), "exe")
+	target, err := os.Readlink(path)
+	if err != nil {
+		return ""
+	}
+	return target
 }
 
 func procFdInodeToPid() map[uint64]int {
