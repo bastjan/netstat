@@ -41,11 +41,11 @@ type Entry struct {
 	Inode uint64
 
 	// IP holds the local IP for the connection.
-	IP string
+	IP net.IP
 	// Port holds the local port for the connection.
 	Port int64
 	// RemoteIP holds the remote IP for the connection.
-	RemoteIP string
+	RemoteIP net.IP
 	// RemotePort holds the remote port for the connection.
 	RemotePort int64
 }
@@ -159,8 +159,8 @@ func hexToDec(hex string) int64 {
 	return dec
 }
 
-func parseIP(ip string) string {
-	return net.IP(parseIPSegments(ip)).String()
+func parseIP(ip string) net.IP {
+	return net.IP(parseIPSegments(ip))
 }
 
 func parseIPSegments(ip string) []uint8 {

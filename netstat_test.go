@@ -1,6 +1,7 @@
 package netstat_test
 
 import (
+	"net"
 	"testing"
 
 	"gotest.tools/assert"
@@ -16,9 +17,9 @@ var (
 
 		Inode: 44360,
 
-		IP:         "127.0.0.1",
+		IP:         net.ParseIP("127.0.0.1"),
 		Port:       38911,
-		RemoteIP:   "0.0.0.0",
+		RemoteIP:   net.ParseIP("0.0.0.0"),
 		RemotePort: 0,
 	}
 
@@ -29,9 +30,9 @@ var (
 
 		Inode: 44365,
 
-		IP:         "2001::4:0:131b",
+		IP:         net.ParseIP("2001::4:0:131b"),
 		Port:       41703,
-		RemoteIP:   "::",
+		RemoteIP:   net.ParseIP("::"),
 		RemotePort: 0,
 	}
 )
