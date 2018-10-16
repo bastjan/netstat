@@ -31,7 +31,7 @@ type Connection struct {
 	// Exe contains the path to the process.
 	// Exe is empty if there was an error reading /proc/pid/exe.
 	Exe string
-	// Cmdline contains the complete command line for the process.
+	// Cmdline contains the complete command line for the process split by \000. Trailing \000 removed.
 	// Returns an empty array if /proc/pid/cmdline can't be read.
 	Cmdline []string
 	// Pid contains the pid of the process. Is zero if open connection can't be assigned to a pid.
