@@ -4,9 +4,9 @@ package netstat
 
 import "strconv"
 
-const _TCPState_name = "ESTABLISHEDSYN_SENTSYN_RECVFIN_WAIT1FIN_WAIT2TIME_WAITCLOSECLOSE_WAITLAST_ACKLISTENCLOSING"
+const _TCPState_name = "ESTABLISHEDSYN_SENTSYN_RECVFIN_WAIT1FIN_WAIT2TIME_WAITCLOSECLOSE_WAITLAST_ACKLISTENCLOSINGNEW_SYN_RECV"
 
-var _TCPState_index = [...]uint8{0, 0, 11, 19, 27, 36, 45, 54, 59, 69, 77, 83, 90}
+var _TCPState_index = [...]uint8{0, 0, 11, 19, 27, 36, 45, 54, 59, 69, 77, 83, 90, 102}
 
 func (i TCPState) String() string {
 	if i < 0 || i >= TCPState(len(_TCPState_index)-1) {

@@ -24,6 +24,7 @@ const (
 	TCPLastAck     // LAST_ACK
 	TCPListen      // LISTEN
 	TCPClosing     // CLOSING
+	TCPNewSynRecv  // NEW_SYN_RECV
 )
 
 func tcpStatefromHex(hex string) TCPState {
