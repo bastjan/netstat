@@ -2,7 +2,7 @@
 
 [![GoDoc][doc-img]][doc] [![CI Status][ci-img]][ci] [![Coverage Status][cover-img]][cover] [![Go Report Card][report-img]][report]
 
-Package netstat helps you query open socket connections.
+Package netstat helps you query open network connections.
 
 ## Getting Started
 

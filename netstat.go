@@ -1,7 +1,7 @@
 /*
-Package netstat helps you query open socket connections.
+Package netstat helps you query open network connections.
 
-Netstat searches the proc filesystem to gather information about open connections and the
+Netstat searches the proc filesystem to gather information about open network connections and the
 associated processes.
 
 There is currently no support planned for Mac OS or *BSD without procfs support.
@@ -34,19 +34,19 @@ type Entry struct {
 	// Cmdline contains the complete command line for the process.
 	// Returns an empty array if /proc/pid/cmdline can't be read.
 	Cmdline []string
-	// Pid contains the pid of the process. Is zero if open socket can't be assigned to a pid.
+	// Pid contains the pid of the process. Is zero if open connection can't be assigned to a pid.
 	Pid int
 
-	// Inode contains the inode for the open socket.
+	// Inode contains the inode for the open connection.
 	Inode uint64
 
-	// IP holds the local IP for the socket.
+	// IP holds the local IP for the connection.
 	IP string
-	// Port holds the local port for the socket.
+	// Port holds the local port for the connection.
 	Port int64
-	// RemoteIP holds the remote IP for the socket.
+	// RemoteIP holds the remote IP for the connection.
 	RemoteIP string
-	// RemotePort holds the remote port for the socket.
+	// RemotePort holds the remote port for the connection.
 	RemotePort int64
 }
 
@@ -54,13 +54,13 @@ type Entry struct {
 var ProcRoot = "/proc"
 
 var (
-	// TCP contains the standard location to read open TCP IPv4 sockets.
+	// TCP contains the standard location to read open TCP IPv4 connections.
 	TCP = Netstat("net/tcp")
-	// TCP6 contains the standard location to read open TCP IPv6 sockets.
+	// TCP6 contains the standard location to read open TCP IPv6 connections.
 	TCP6 = Netstat("net/tcp6")
-	// UDP contains the standard location to read open UDP IPv4 sockets.
+	// UDP contains the standard location to read open UDP IPv4 connections.
 	UDP = Netstat("net/udp")
-	// UDP6 contains the standard location to read open UDP IPv6 sockets.
+	// UDP6 contains the standard location to read open UDP IPv6 connections.
 	UDP6 = Netstat("net/udp6")
 )
 
