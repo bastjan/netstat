@@ -143,11 +143,14 @@ func (n Netstat) readProcNetFile() ([][]string, error) {
 	return lines[1:], nil
 }
 
+// The values in a line are separated by one or more space.
+// Split by space and remove all resulting empty strings.
+// strings.Split("01   AB", " ") results in ["01", "", "", "AB"]
 func lineParts(line string) []string {
 	parts := strings.Split(line, " ")
 	filtered := parts[:0]
 	for _, part := range parts {
-		if len(part) > 0 {
+		if part != "" {
 			filtered = append(filtered, part)
 		}
 	}
