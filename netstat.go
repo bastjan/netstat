@@ -167,6 +167,9 @@ func parseIP(ip string) net.IP {
 	return net.IP(parseIPSegments(ip))
 }
 
+// The IP address is encoded hexadecimal and in reverse order.
+// Take two characters and parse then from back to front.
+// 01 00 00 7F -> 127 0 0 1
 func parseIPSegments(ip string) []uint8 {
 	segments := make([]uint8, 0, len(ip)/2)
 	for i := len(ip); i > 0; i -= 2 {
