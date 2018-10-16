@@ -43,11 +43,11 @@ type Entry struct {
 	// IP holds the local IP for the connection.
 	IP net.IP
 	// Port holds the local port for the connection.
-	Port int64
+	Port int
 	// RemoteIP holds the remote IP for the connection.
 	RemoteIP net.IP
 	// RemotePort holds the remote port for the connection.
-	RemotePort int64
+	RemotePort int
 }
 
 // ProcRoot should point to the root of the proc file system
@@ -102,9 +102,9 @@ func procNetToEntries(lines [][]string, inodeToPid map[uint64]int) []Entry {
 			Pid:        pid,
 			Inode:      inode,
 			IP:         parseIP(localIPPort[0]),
-			Port:       hexToDec(localIPPort[1]),
+			Port:       parsePort(localIPPort[1]),
 			RemoteIP:   parseIP(remoteIPPort[0]),
-			RemotePort: hexToDec(remoteIPPort[1]),
+			RemotePort: parsePort(remoteIPPort[1]),
 		}
 
 		entries = append(entries, entry)
@@ -154,9 +154,10 @@ func lineParts(line string) []string {
 	return filtered
 }
 
-func hexToDec(hex string) int64 {
-	dec, _ := strconv.ParseInt(hex, 16, 64)
-	return dec
+func parsePort(port string) int {
+	// port number is an unsigned 16-bit integer
+	dec, _ := strconv.ParseUint(port, 16, 16)
+	return int(dec)
 }
 
 func parseIP(ip string) net.IP {
