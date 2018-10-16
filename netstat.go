@@ -48,6 +48,9 @@ type Connection struct {
 	RemoteIP net.IP
 	// RemotePort holds the remote port for the connection.
 	RemotePort int
+	// State represents the state of a TCP connection. The UDP 'states' shown
+	// are recycled from TCP connection states and have a slightly different meaning.
+	State TCPState
 }
 
 // ProcRoot should point to the root of the proc file system
@@ -105,6 +108,7 @@ func procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []Connect
 			Port:       parsePort(localIPPort[1]),
 			RemoteIP:   parseIP(remoteIPPort[0]),
 			RemotePort: parsePort(remoteIPPort[1]),
+			State:      tcpStatefromHex(line[3]),
 		}
 
 		connections = append(connections, connection)

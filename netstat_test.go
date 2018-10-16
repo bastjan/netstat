@@ -21,6 +21,7 @@ var (
 		Port:       38911,
 		RemoteIP:   net.ParseIP("0.0.0.0"),
 		RemotePort: 0,
+		State:      netstat.TCPListen,
 	}
 
 	tcp6Connection = netstat.Connection{
@@ -34,6 +35,7 @@ var (
 		Port:       41703,
 		RemoteIP:   net.ParseIP("::"),
 		RemotePort: 0,
+		State:      netstat.TCPListen,
 	}
 )
 
