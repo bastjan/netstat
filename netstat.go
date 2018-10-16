@@ -69,9 +69,9 @@ var (
 	procFdLinkParseType2 = regexp.MustCompile(`^\[0000\]:(\d+)$`)
 )
 
-// Entries queries the given /proc/net file and returns the found entries.
+// Connections queries the given /proc/net file and returns the found connections.
 // Returns an error if the /proc/net file can't be read.
-func (n Netstat) Entries() ([]Connection, error) {
+func (n Netstat) Connections() ([]Connection, error) {
 	inodeToPid := make(chan map[uint64]int)
 
 	go func() {
@@ -83,12 +83,12 @@ func (n Netstat) Entries() ([]Connection, error) {
 		return nil, err
 	}
 
-	entries := procNetToEntries(lines, <-inodeToPid)
+	connections := procNetToConnections(lines, <-inodeToPid)
 
-	return entries, nil
+	return connections, nil
 }
 
-func procNetToEntries(lines [][]string, inodeToPid map[uint64]int) []Connection {
+func procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []Connection {
 	connections := make([]Connection, 0, len(lines))
 	for _, line := range lines {
 		localIPPort := strings.Split(line[1], ":")

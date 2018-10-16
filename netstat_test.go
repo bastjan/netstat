@@ -41,23 +41,23 @@ func init() {
 	netstat.ProcRoot = "./test/proc"
 }
 
-func TestEntries(t *testing.T) {
-	entries, err := netstat.TCP.Entries()
+func TestConnections(t *testing.T) {
+	connections, err := netstat.TCP.Connections()
 	assert.NilError(t, err)
-	assert.DeepEqual(t, entries, []netstat.Connection{tcpConnection})
+	assert.DeepEqual(t, connections, []netstat.Connection{tcpConnection})
 
-	entries, err = netstat.TCP6.Entries()
+	connections, err = netstat.TCP6.Connections()
 	assert.NilError(t, err)
-	assert.DeepEqual(t, entries, []netstat.Connection{tcp6Connection})
+	assert.DeepEqual(t, connections, []netstat.Connection{tcp6Connection})
 }
 
-func TestEntriesProcNetNotFound(t *testing.T) {
-	_, err := netstat.Netstat("./nothere").Entries()
+func TestConnectionsProcNetNotFound(t *testing.T) {
+	_, err := netstat.Netstat("./nothere").Connections()
 	assert.ErrorContains(t, err, "can't open proc file")
 	assert.ErrorContains(t, err, "test/proc/nothere")
 }
 
-func TestEntriesEmptyFileDoesNotCrashNetstat(t *testing.T) {
-	_, err := netstat.Netstat("net/empty").Entries()
+func TestConnectionsEmptyFileDoesNotCrashNetstat(t *testing.T) {
+	_, err := netstat.Netstat("net/empty").Connections()
 	assert.ErrorContains(t, err, "net/empty has no content")
 }

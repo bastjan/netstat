@@ -10,10 +10,10 @@ Package netstat helps you query open network connections.
 import "github.com/bastjan/netstat"
 
 // Query open tcp sockets
-netstat.TCP.Entries()
+netstat.TCP.Connections()
 
 // Query open udp sockets for ipv6 connections
-netstat.UDP6.Entries()
+netstat.UDP6.Connections()
 ```
 
 ## Development Status: Work in Progress
