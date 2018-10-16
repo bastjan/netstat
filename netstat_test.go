@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	tcpEntry = netstat.Entry{
+	tcpConnection = netstat.Connection{
 		Exe:     "/bin/sleep",
 		Cmdline: []string{},
 		Pid:     3001,
@@ -23,7 +23,7 @@ var (
 		RemotePort: 0,
 	}
 
-	tcpEntry6 = netstat.Entry{
+	tcp6Connection = netstat.Connection{
 		Exe:     "",
 		Cmdline: []string{"/usr/bin/bundle", "exec", "puma", "-p41703"},
 		Pid:     3002,
@@ -44,11 +44,11 @@ func init() {
 func TestEntries(t *testing.T) {
 	entries, err := netstat.TCP.Entries()
 	assert.NilError(t, err)
-	assert.DeepEqual(t, entries, []netstat.Entry{tcpEntry})
+	assert.DeepEqual(t, entries, []netstat.Connection{tcpConnection})
 
 	entries, err = netstat.TCP6.Entries()
 	assert.NilError(t, err)
-	assert.DeepEqual(t, entries, []netstat.Entry{tcpEntry6})
+	assert.DeepEqual(t, entries, []netstat.Connection{tcp6Connection})
 }
 
 func TestEntriesProcNetNotFound(t *testing.T) {

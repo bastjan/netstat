@@ -26,8 +26,8 @@ import (
 // about open sockets can be gathered.
 type Netstat string
 
-// Entry contains the gathered information.
-type Entry struct {
+// Connection contains the gathered information about an open network connection.
+type Connection struct {
 	// Exe contains the path to the process.
 	// Exe is empty if there was an error reading /proc/pid/exe.
 	Exe string
@@ -71,7 +71,7 @@ var (
 
 // Entries queries the given /proc/net file and returns the found entries.
 // Returns an error if the /proc/net file can't be read.
-func (n Netstat) Entries() ([]Entry, error) {
+func (n Netstat) Entries() ([]Connection, error) {
 	inodeToPid := make(chan map[uint64]int)
 
 	go func() {
@@ -88,15 +88,15 @@ func (n Netstat) Entries() ([]Entry, error) {
 	return entries, nil
 }
 
-func procNetToEntries(lines [][]string, inodeToPid map[uint64]int) []Entry {
-	entries := make([]Entry, 0, len(lines))
+func procNetToEntries(lines [][]string, inodeToPid map[uint64]int) []Connection {
+	connections := make([]Connection, 0, len(lines))
 	for _, line := range lines {
 		localIPPort := strings.Split(line[1], ":")
 		remoteIPPort := strings.Split(line[2], ":")
 		inode := parseInode(line[9])
 		pid := inodeToPid[inode]
 
-		entry := Entry{
+		connection := Connection{
 			Exe:        procGetExe(pid),
 			Cmdline:    procGetCmdline(pid),
 			Pid:        pid,
@@ -107,9 +107,9 @@ func procNetToEntries(lines [][]string, inodeToPid map[uint64]int) []Entry {
 			RemotePort: parsePort(remoteIPPort[1]),
 		}
 
-		entries = append(entries, entry)
+		connections = append(connections, connection)
 	}
-	return entries
+	return connections
 }
 
 func parseInode(num string) uint64 {
