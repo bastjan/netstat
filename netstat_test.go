@@ -17,11 +17,15 @@ var (
 
 		Inode: 44360,
 
+		UserID:     "6523",
 		IP:         net.ParseIP("127.0.0.1"),
 		Port:       38911,
 		RemoteIP:   net.ParseIP("0.0.0.0"),
 		RemotePort: 0,
 		State:      netstat.TCPListen,
+
+		TransmitQueue: 50,
+		ReceiveQueue:  100,
 	}
 
 	tcp6Connection = netstat.Connection{
@@ -31,6 +35,7 @@ var (
 
 		Inode: 44365,
 
+		UserID:     "6523",
 		IP:         net.ParseIP("2001::4:0:131b"),
 		Port:       41703,
 		RemoteIP:   net.ParseIP("::"),

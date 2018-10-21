@@ -40,6 +40,10 @@ type Connection struct {
 	// Pid contains the pid of the process. Is zero if open connection can't be assigned to a pid.
 	Pid int
 
+	// UserID represents a user account id. On Linux systems it is usually a uint32.
+	// Type string was chosen because os/user.LookupId() wants a string.
+	UserID string
+
 	// Inode contains the inode for the open connection.
 	Inode uint64
 
@@ -54,6 +58,11 @@ type Connection struct {
 	// State represents the state of a TCP connection. The UDP 'states' shown
 	// are recycled from TCP connection states and have a slightly different meaning.
 	State TCPState
+
+	// TransmitQueue is the outgoing data queue in terms of kernel memory usage in bytes.
+	TransmitQueue uint64
+	// ReceiveQueue is the incoming data queue in terms of kernel memory usage in bytes.
+	ReceiveQueue uint64
 }
 
 // ProcRoot should point to the root of the proc file system
@@ -99,19 +108,23 @@ func procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []Connect
 	for _, line := range lines {
 		localIPPort := strings.Split(line[1], ":")
 		remoteIPPort := strings.Split(line[2], ":")
-		inode := parseInode(line[9])
+		inode := parseUint64(line[9])
 		pid := inodeToPid[inode]
+		queues := strings.Split(line[4], ":")
 
 		connection := Connection{
-			Exe:        procGetExe(pid),
-			Cmdline:    procGetCmdline(pid),
-			Pid:        pid,
-			Inode:      inode,
-			IP:         parseIP(localIPPort[0]),
-			Port:       parsePort(localIPPort[1]),
-			RemoteIP:   parseIP(remoteIPPort[0]),
-			RemotePort: parsePort(remoteIPPort[1]),
-			State:      tcpStatefromHex(line[3]),
+			Exe:           procGetExe(pid),
+			Cmdline:       procGetCmdline(pid),
+			Pid:           pid,
+			Inode:         inode,
+			UserID:        line[7],
+			IP:            parseIP(localIPPort[0]),
+			Port:          parsePort(localIPPort[1]),
+			RemoteIP:      parseIP(remoteIPPort[0]),
+			RemotePort:    parsePort(remoteIPPort[1]),
+			State:         tcpStatefromHex(line[3]),
+			TransmitQueue: parseUint64(queues[0]),
+			ReceiveQueue:  parseUint64(queues[1]),
 		}
 
 		connections = append(connections, connection)
@@ -119,7 +132,7 @@ func procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []Connect
 	return connections
 }
 
-func parseInode(num string) uint64 {
+func parseUint64(num string) uint64 {
 	inode, _ := strconv.ParseUint(num, 10, 64)
 	return inode
 }
