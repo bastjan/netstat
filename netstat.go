@@ -86,7 +86,7 @@ var (
 
 // Connections queries the given /proc/net file and returns the found connections.
 // Returns an error if the /proc/net file can't be read.
-func (n *Netstat) Connections() ([]Connection, error) {
+func (n *Netstat) Connections() ([]*Connection, error) {
 	inodeToPid := make(chan map[uint64]int)
 
 	go func() {
@@ -103,8 +103,8 @@ func (n *Netstat) Connections() ([]Connection, error) {
 	return connections, nil
 }
 
-func procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []Connection {
-	connections := make([]Connection, 0, len(lines))
+func procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []*Connection {
+	connections := make([]*Connection, 0, len(lines))
 	for _, line := range lines {
 		localIPPort := strings.Split(line[1], ":")
 		remoteIPPort := strings.Split(line[2], ":")
@@ -112,7 +112,7 @@ func procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []Connect
 		pid := inodeToPid[inode]
 		queues := strings.Split(line[4], ":")
 
-		connection := Connection{
+		connection := &Connection{
 			Exe:           procGetExe(pid),
 			Cmdline:       procGetCmdline(pid),
 			Pid:           pid,

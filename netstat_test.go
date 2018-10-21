@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	tcpConnection = netstat.Connection{
+	tcpConnection = &netstat.Connection{
 		Exe:     "/bin/sleep",
 		Cmdline: []string{},
 		Pid:     3001,
@@ -28,7 +28,7 @@ var (
 		ReceiveQueue:  100,
 	}
 
-	tcp6Connection = netstat.Connection{
+	tcp6Connection = &netstat.Connection{
 		Exe:     "",
 		Cmdline: []string{"/usr/bin/bundle", "exec", "puma", "-p41703"},
 		Pid:     3002,
@@ -51,11 +51,11 @@ func init() {
 func TestConnections(t *testing.T) {
 	connections, err := netstat.TCP.Connections()
 	assert.NilError(t, err)
-	assert.DeepEqual(t, connections, []netstat.Connection{tcpConnection})
+	assert.DeepEqual(t, connections, []*netstat.Connection{tcpConnection})
 
 	connections, err = netstat.TCP6.Connections()
 	assert.NilError(t, err)
-	assert.DeepEqual(t, connections, []netstat.Connection{tcp6Connection})
+	assert.DeepEqual(t, connections, []*netstat.Connection{tcp6Connection})
 }
 
 func TestConnectionsProcNetNotFound(t *testing.T) {
