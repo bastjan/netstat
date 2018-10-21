@@ -209,11 +209,8 @@ func procGetExe(pid int) string {
 func procFdInodeToPid() map[uint64]int {
 	inodeToPid := make(map[uint64]int)
 
-	paths, err := filepath.Glob(filepath.Join(ProcRoot, "[0-9]*/fd/[0-9]*"))
-	if err != nil {
-		return inodeToPid
-	}
-
+	// Ignoring error: The only possible error is bad pattern.
+	paths, _ := filepath.Glob(filepath.Join(ProcRoot, "[0-9]*/fd/[0-9]*"))
 	for _, link := range paths {
 		target, err := os.Readlink(link)
 		if err != nil {
