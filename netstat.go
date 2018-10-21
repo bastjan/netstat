@@ -22,9 +22,12 @@ import (
 	"strings"
 )
 
-// Netstat should point to a file in the proc filesystem where information
+// Netstat points to a file in the proc filesystem where information
 // about open sockets can be gathered.
-type Netstat string
+type Netstat struct {
+	// RelPath is the proc file path relative to ProcRoot
+	RelPath string
+}
 
 // Connection contains the gathered information about an open network connection.
 type Connection struct {
@@ -58,13 +61,13 @@ var ProcRoot = "/proc"
 
 var (
 	// TCP contains the standard location to read open TCP IPv4 connections.
-	TCP = Netstat("net/tcp")
+	TCP = &Netstat{"net/tcp"}
 	// TCP6 contains the standard location to read open TCP IPv6 connections.
-	TCP6 = Netstat("net/tcp6")
+	TCP6 = &Netstat{"net/tcp6"}
 	// UDP contains the standard location to read open UDP IPv4 connections.
-	UDP = Netstat("net/udp")
+	UDP = &Netstat{"net/udp"}
 	// UDP6 contains the standard location to read open UDP IPv6 connections.
-	UDP6 = Netstat("net/udp6")
+	UDP6 = &Netstat{"net/udp6"}
 )
 
 var (
@@ -74,7 +77,7 @@ var (
 
 // Connections queries the given /proc/net file and returns the found connections.
 // Returns an error if the /proc/net file can't be read.
-func (n Netstat) Connections() ([]Connection, error) {
+func (n *Netstat) Connections() ([]Connection, error) {
 	inodeToPid := make(chan map[uint64]int)
 
 	go func() {
@@ -121,10 +124,11 @@ func parseInode(num string) uint64 {
 	return inode
 }
 
-func (n Netstat) readProcNetFile() ([][]string, error) {
+func (n *Netstat) readProcNetFile() ([][]string, error) {
 	var lines [][]string
 
-	f, err := os.Open(filepath.Join(ProcRoot, string(n)))
+	path := filepath.Join(ProcRoot, n.RelPath)
+	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("can't open proc file: %s", err)
 	}
@@ -141,7 +145,7 @@ func (n Netstat) readProcNetFile() ([][]string, error) {
 		lines = append(lines, lineParts(string(bytes.Trim(line, "\t\n "))))
 	}
 	if len(lines) == 0 {
-		return nil, fmt.Errorf("can't read proc file: %s has no content", n)
+		return nil, fmt.Errorf("can't read proc file: %s has no content", path)
 	}
 	// Remove header line
 	return lines[1:], nil

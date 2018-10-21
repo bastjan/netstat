@@ -54,12 +54,12 @@ func TestConnections(t *testing.T) {
 }
 
 func TestConnectionsProcNetNotFound(t *testing.T) {
-	_, err := netstat.Netstat("./nothere").Connections()
+	_, err := (&netstat.Netstat{RelPath: "./nothere"}).Connections()
 	assert.ErrorContains(t, err, "can't open proc file")
 	assert.ErrorContains(t, err, "test/proc/nothere")
 }
 
 func TestConnectionsEmptyFileDoesNotCrashNetstat(t *testing.T) {
-	_, err := netstat.Netstat("net/empty").Connections()
+	_, err := (&netstat.Netstat{RelPath: "net/empty"}).Connections()
 	assert.ErrorContains(t, err, "net/empty has no content")
 }
