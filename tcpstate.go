@@ -1,4 +1,5 @@
 //go:generate stringer -type=TCPState -linecomment
+
 package netstat
 
 import (
