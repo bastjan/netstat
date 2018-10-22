@@ -16,6 +16,8 @@ netstat.TCP.Connections()
 netstat.UDP6.Connections()
 ```
 
+See [netstat_tulpen.go](examples/netstat_tulpen/netstat_tulpen.go) for a more throughout example.
+
 ## Development Status: Work in Progress
 
 The api is not yet final and can change.
