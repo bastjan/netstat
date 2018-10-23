@@ -40,6 +40,9 @@ type Connection struct {
 	TransmitQueue uint64
 	// ReceiveQueue is the incoming data queue in terms of kernel memory usage in bytes.
 	ReceiveQueue uint64
+
+	// Protocol contains the protocol this connection was discovered with.
+	Protocol *Protocol
 }
 
 // User looks up the user owning the socket.

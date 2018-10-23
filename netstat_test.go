@@ -11,6 +11,8 @@ import (
 
 var (
 	tcpConnection = &netstat.Connection{
+		Protocol: netstat.TCP,
+
 		Exe:     "/bin/sleep",
 		Cmdline: []string{},
 		Pid:     3001,
@@ -29,6 +31,8 @@ var (
 	}
 
 	tcp6Connection = &netstat.Connection{
+		Protocol: netstat.TCP6,
+
 		Exe:     "",
 		Cmdline: []string{"/usr/bin/bundle", "exec", "puma", "-p41703"},
 		Pid:     3002,
@@ -59,12 +63,12 @@ func TestConnections(t *testing.T) {
 }
 
 func TestConnectionsProcNetNotFound(t *testing.T) {
-	_, err := (&netstat.Netstat{RelPath: "./nothere"}).Connections()
+	_, err := (&netstat.Protocol{RelPath: "./nothere"}).Connections()
 	assert.ErrorContains(t, err, "can't open proc file")
 	assert.ErrorContains(t, err, "test/proc/nothere")
 }
 
 func TestConnectionsEmptyFileDoesNotCrashNetstat(t *testing.T) {
-	_, err := (&netstat.Netstat{RelPath: "net/empty"}).Connections()
+	_, err := (&netstat.Protocol{RelPath: "net/empty"}).Connections()
 	assert.ErrorContains(t, err, "net/empty has no content")
 }

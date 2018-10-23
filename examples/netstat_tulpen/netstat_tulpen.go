@@ -20,23 +20,23 @@ var header = []string{"Proto", "Recv-Q", "Send-Q", "Local Address", "Foreign Add
 
 func main() {
 	out := [][]string{header}
-	out = append(out, get("tcp", netstat.TCP)...)
-	out = append(out, get("tcp6", netstat.TCP6)...)
-	out = append(out, get("udp", netstat.UDP)...)
-	out = append(out, get("udp6", netstat.UDP6)...)
+	out = append(out, formatConnections(netstat.TCP)...)
+	out = append(out, formatConnections(netstat.TCP6)...)
+	out = append(out, formatConnections(netstat.UDP)...)
+	out = append(out, formatConnections(netstat.UDP6)...)
 
 	printAligned(out)
 }
 
-func get(protoName string, loc *netstat.Netstat) [][]string {
+func formatConnections(loc *netstat.Protocol) [][]string {
 	connections, _ := loc.Connections()
 	results := make([][]string, 0, len(connections))
 	for _, conn := range connections {
-		if !isListening(protoName, conn.State) {
+		if !isListening(conn) {
 			continue
 		}
 		results = append(results, []string{
-			protoName,
+			conn.Protocol.Name,
 			strconv.FormatUint(conn.ReceiveQueue, 10),
 			strconv.FormatUint(conn.TransmitQueue, 10),
 			fmt.Sprintf("%s:%s", conn.IP, formatPort(conn.Port)),
@@ -51,9 +51,9 @@ func get(protoName string, loc *netstat.Netstat) [][]string {
 	return results
 }
 
-func isListening(protoName string, tcpState netstat.TCPState) bool {
-	tcpListen := strings.HasPrefix(protoName, "tcp") && tcpState == netstat.TCPListen
-	udpListen := strings.HasPrefix(protoName, "udp") && tcpState == netstat.TCPClose
+func isListening(conn *netstat.Connection) bool {
+	tcpListen := strings.HasPrefix(conn.Protocol.Name, "tcp") && conn.State == netstat.TCPListen
+	udpListen := strings.HasPrefix(conn.Protocol.Name, "udp") && conn.State == netstat.TCPClose
 	return tcpListen || udpListen
 }
 

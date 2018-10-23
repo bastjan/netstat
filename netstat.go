@@ -22,9 +22,11 @@ import (
 	"strings"
 )
 
-// Netstat points to a file in the proc filesystem where information
+// Protocol points to a file in the proc filesystem where information
 // about open sockets can be gathered.
-type Netstat struct {
+type Protocol struct {
+	// Name contains the protocol name. Not used internally.
+	Name string
 	// RelPath is the proc file path relative to ProcRoot
 	RelPath string
 }
@@ -34,13 +36,13 @@ var ProcRoot = "/proc"
 
 var (
 	// TCP contains the standard location to read open TCP IPv4 connections.
-	TCP = &Netstat{"net/tcp"}
+	TCP = &Protocol{"tcp", "net/tcp"}
 	// TCP6 contains the standard location to read open TCP IPv6 connections.
-	TCP6 = &Netstat{"net/tcp6"}
+	TCP6 = &Protocol{"tcp6", "net/tcp6"}
 	// UDP contains the standard location to read open UDP IPv4 connections.
-	UDP = &Netstat{"net/udp"}
+	UDP = &Protocol{"udp", "net/udp"}
 	// UDP6 contains the standard location to read open UDP IPv6 connections.
-	UDP6 = &Netstat{"net/udp6"}
+	UDP6 = &Protocol{"udp6", "net/udp6"}
 )
 
 var (
@@ -50,24 +52,24 @@ var (
 
 // Connections queries the given /proc/net file and returns the found connections.
 // Returns an error if the /proc/net file can't be read.
-func (n *Netstat) Connections() ([]*Connection, error) {
+func (p *Protocol) Connections() ([]*Connection, error) {
 	inodeToPid := make(chan map[uint64]int)
 
 	go func() {
 		inodeToPid <- procFdInodeToPid()
 	}()
 
-	lines, err := n.readProcNetFile()
+	lines, err := p.readProcNetFile()
 	if err != nil {
 		return nil, err
 	}
 
-	connections := procNetToConnections(lines, <-inodeToPid)
+	connections := p.procNetToConnections(lines, <-inodeToPid)
 
 	return connections, nil
 }
 
-func procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []*Connection {
+func (p *Protocol) procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []*Connection {
 	connections := make([]*Connection, 0, len(lines))
 	for _, line := range lines {
 		localIPPort := strings.Split(line[1], ":")
@@ -89,6 +91,7 @@ func procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []*Connec
 			State:         tcpStatefromHex(line[3]),
 			TransmitQueue: parseUint64(queues[0]),
 			ReceiveQueue:  parseUint64(queues[1]),
+			Protocol:      p,
 		}
 
 		connections = append(connections, connection)
@@ -101,10 +104,10 @@ func parseUint64(num string) uint64 {
 	return inode
 }
 
-func (n *Netstat) readProcNetFile() ([][]string, error) {
+func (p *Protocol) readProcNetFile() ([][]string, error) {
 	var lines [][]string
 
-	path := filepath.Join(ProcRoot, n.RelPath)
+	path := filepath.Join(ProcRoot, p.RelPath)
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("can't open proc file: %s", err)
