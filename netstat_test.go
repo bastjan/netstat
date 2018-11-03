@@ -2,9 +2,10 @@ package netstat_test
 
 import (
 	"net"
+	"strings"
 	"testing"
 
-	"gotest.tools/assert"
+	"github.com/google/go-cmp/cmp"
 
 	"github.com/bastjan/netstat"
 )
@@ -53,22 +54,36 @@ func init() {
 }
 
 func TestConnections(t *testing.T) {
-	connections, err := netstat.TCP.Connections()
-	assert.NilError(t, err)
-	assert.DeepEqual(t, connections, []*netstat.Connection{tcpConnection})
-
-	connections, err = netstat.TCP6.Connections()
-	assert.NilError(t, err)
-	assert.DeepEqual(t, connections, []*netstat.Connection{tcp6Connection})
+	compareResult := func(p *netstat.Protocol, expected []*netstat.Connection) {
+		connections, err := p.Connections()
+		if err != nil {
+			t.Error("Connections() returned unexpected errors:", err)
+		}
+		if diff := cmp.Diff(connections, expected); diff != "" {
+			t.Error("Connections() returned connections differ from expected connections:\n", diff)
+		}
+	}
+	compareResult(netstat.TCP, []*netstat.Connection{tcpConnection})
+	compareResult(netstat.TCP6, []*netstat.Connection{tcp6Connection})
 }
 
 func TestConnectionsProcNetNotFound(t *testing.T) {
 	_, err := (&netstat.Protocol{RelPath: "./nothere"}).Connections()
-	assert.ErrorContains(t, err, "can't open proc file")
-	assert.ErrorContains(t, err, "test/proc/nothere")
+	expectError(t, err, "test/proc/nothere: no such file or directory", "Connections() should return an error if the proc file can't be found")
 }
 
-func TestConnectionsEmptyFileDoesNotCrashNetstat(t *testing.T) {
+func TestConnectionsEmptyFile(t *testing.T) {
 	_, err := (&netstat.Protocol{RelPath: "net/empty"}).Connections()
-	assert.ErrorContains(t, err, "net/empty has no content")
+	expectError(t, err, "net/empty has no content", "Connections() should return an error if net file is empty")
+}
+
+func expectError(t *testing.T, err error, expectedErr, nilMessage string) {
+	t.Helper()
+	if err == nil {
+		t.Fatal(nilMessage)
+	}
+	if strings.Contains(err.Error(), expectedErr) {
+		return
+	}
+	t.Error("Error message should contain filename and error.", "Expected:", expectedErr, "Got:", err.Error())
 }
