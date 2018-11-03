@@ -18,10 +18,11 @@ netstat.UDP6.Connections()
 
 See [netstat_tulpen.go](examples/netstat_tulpen/netstat_tulpen.go) for a more throughout example.
 
-## Development Status: Work in Progress
+## Development Status: Stable
 
-The api is not yet final and can change.
-First stable release will be version 1.0.0.
+This library is v1 and follows SemVer.
+
+No breaking changes will be made to exported APIs before v2.0.0.
 
 ## Support for Mac OS and *BSD
 
