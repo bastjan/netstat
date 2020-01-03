@@ -53,7 +53,7 @@ var (
 // Connections queries the given /proc/net file and returns the found connections.
 // Returns an error if the /proc/net file can't be read.
 func (p *Protocol) Connections() ([]*Connection, error) {
-	inodeToPid := make(chan map[uint64]int)
+	// inodeToPid := make(chan map[uint64]int)
 
 	// go func() {
 	// 	inodeToPid <- procFdInodeToPid()
