@@ -55,34 +55,29 @@ var (
 func (p *Protocol) Connections() ([]*Connection, error) {
 	inodeToPid := make(chan map[uint64]int)
 
-	go func() {
-		inodeToPid <- procFdInodeToPid()
-	}()
+	// go func() {
+	// 	inodeToPid <- procFdInodeToPid()
+	// }()
 
 	lines, err := p.readProcNetFile()
 	if err != nil {
 		return nil, err
 	}
 
-	connections := p.procNetToConnections(lines, <-inodeToPid)
+	connections := p.procNetToConnections(lines)
 
 	return connections, nil
 }
 
-func (p *Protocol) procNetToConnections(lines [][]string, inodeToPid map[uint64]int) []*Connection {
+func (p *Protocol) procNetToConnections(lines [][]string) []*Connection {
 	connections := make([]*Connection, 0, len(lines))
 	for _, line := range lines {
 		localIPPort := strings.Split(line[1], ":")
 		remoteIPPort := strings.Split(line[2], ":")
-		inode := parseUint64(line[9])
-		pid := inodeToPid[inode]
+
 		queues := strings.Split(line[4], ":")
 
 		connection := &Connection{
-			Exe:           procGetExe(pid),
-			Cmdline:       procGetCmdline(pid),
-			Pid:           pid,
-			Inode:         inode,
 			UserID:        line[7],
 			IP:            parseIP(localIPPort[0]),
 			Port:          parsePort(localIPPort[1]),
