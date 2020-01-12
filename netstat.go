@@ -45,6 +45,14 @@ var (
 	UDP6 = &Protocol{"udp6", "net/udp6"}
 )
 
+type option int
+
+const (
+	// SkipProcessLookup skips the rather slow PID lookup.
+	// Exe, Cmdline, and Pid will be empty if called with this options.
+	SkipProcessLookup option = iota + 1
+)
+
 var (
 	procFdLinkParseType1 = regexp.MustCompile(`^socket:\[(\d+)\]$`)
 	procFdLinkParseType2 = regexp.MustCompile(`^\[0000\]:(\d+)$`)
@@ -52,10 +60,14 @@ var (
 
 // Connections queries the given /proc/net file and returns the found connections.
 // Returns an error if the /proc/net file can't be read.
-func (p *Protocol) Connections() ([]*Connection, error) {
+func (p *Protocol) Connections(options ...option) ([]*Connection, error) {
 	inodeToPid := make(chan map[uint64]int)
 
 	go func() {
+		if hasOption(options, SkipProcessLookup) {
+			inodeToPid <- make(map[uint64]int)
+			return
+		}
 		inodeToPid <- procFdInodeToPid()
 	}()
 
@@ -226,4 +238,13 @@ func procFdExtractInode(fdLinkTarget string) (inode uint64, found bool) {
 
 	inode, _ = strconv.ParseUint(match[1], 10, 64)
 	return inode, true
+}
+
+func hasOption(os []option, o option) bool {
+	for _, ot := range os {
+		if ot == o {
+			return true
+		}
+	}
+	return false
 }

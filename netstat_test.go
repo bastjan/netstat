@@ -67,6 +67,20 @@ func TestConnections(t *testing.T) {
 	compareResult(netstat.TCP6, []*netstat.Connection{tcp6Connection})
 }
 
+func TestConnectionsOptionSkipPidLookup(t *testing.T) {
+	compareResult := func(p *netstat.Protocol, expected []*netstat.Connection) {
+		connections, err := p.Connections(netstat.SkipProcessLookup)
+		if err != nil {
+			t.Error("Connections() returned unexpected errors:", err)
+		}
+		if diff := cmp.Diff(connections, expected); diff != "" {
+			t.Error("Connections() returned connections differ from expected connections:\n", diff)
+		}
+	}
+	compareResult(netstat.TCP, []*netstat.Connection{stripProcessInfo(tcpConnection)})
+	compareResult(netstat.TCP6, []*netstat.Connection{stripProcessInfo(tcp6Connection)})
+}
+
 func TestConnectionsProcNetNotFound(t *testing.T) {
 	_, err := (&netstat.Protocol{RelPath: "./nothere"}).Connections()
 	expectError(t, err, "test/proc/nothere: no such file or directory", "Connections() should return an error if the proc file can't be found")
@@ -86,4 +100,16 @@ func expectError(t *testing.T, err error, expectedErr, nilMessage string) {
 		return
 	}
 	t.Error("Error message should contain filename and error.", "Expected:", expectedErr, "Got:", err.Error())
+}
+
+func stripProcessInfo(c *netstat.Connection) *netstat.Connection {
+	r := new(netstat.Connection)
+
+	*r = *c
+
+	r.Exe = ""
+	r.Cmdline = []string{}
+	r.Pid = 0
+
+	return r
 }
